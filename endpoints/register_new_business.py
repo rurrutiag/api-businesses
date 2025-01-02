@@ -2,6 +2,7 @@ import uuid
 import os
 import json
 import requests
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from tools.validate_unique_id import generate_unique_branch_ids, generate_unique_company_id, get_all_companies_et_branches_id
 
