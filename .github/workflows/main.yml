@@ -35,6 +35,13 @@ jobs:
       #   run: |
       #     ./.venv/bin/python -m unittest discover  # O tu comando para correr pruebas
 
+      - name: Create startup script for Gunicorn
+        run: |
+          echo "#!/bin/bash" > startup.sh
+          echo "source .venv/bin/activate" >> startup.sh
+          echo ".venv/bin/gunicorn -w 3 -b 0.0.0.0:8000 app:app" >> startup.sh
+          chmod +x startup.sh
+
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
