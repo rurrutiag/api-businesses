@@ -14,50 +14,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Checkout del código fuente
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v4
+      # Configuración de Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Construcción de la imagen Docker
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/myapp:${{ github.sha }} .
+
+      # Iniciar sesión en DockerHub (o ACR si usas Azure Container Registry)
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v2
         with:
-          python-version: '3.9'
-          cache: 'pip'
+          login-server: ${{ secrets.ACR_NAME }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Set up virtual environment
+      # Subir la imagen construida a DockerHub o ACR
+      - name: Push Docker image to ACR
         run: |
-          python -m venv .venv
-          ./.venv/bin/pip install --upgrade pip
-
-      - name: Install dependencies
-        run: |
-          ./.venv/bin/pip install -r requirements.txt
-
-      - name: Validate Flask installation
-        run: |
-          ./.venv/bin/python -c "import flask; print(f'Flask version: {flask.__version__}')"
-
-      # - name: Run tests
-      #   run: |
-      #     ./.venv/bin/python -m unittest discover  # O tu comando para correr pruebas
-
-      - name: Create startup script for Gunicorn
-        run: |
-          echo "#!/bin/bash" > startup.sh
-          echo "python3 -m venv .venv" >> startup.sh
-          echo "source .venv/bin/activate" >> startup.sh
-          echo "pip install --upgrade pip" >> startup.sh
-          echo "pip install -r requirements.txt" >> startup.sh
-          # echo ".venv/bin/gunicorn -w 3 -b 0.0.0.0:8000 app:app" >> startup.sh
-          echo "gunicorn -w 3 -b 0.0.0.0:8000 app:app" >> startup.sh
-          chmod +x startup.sh
-
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-flask-app
-          path: release.zip
+          docker push ${{ secrets.ACR_NAME }}/myapp:${{ github.sha }}
 
   deploy-develop:
     if: github.ref == 'refs/heads/develop'
@@ -70,14 +51,7 @@ jobs:
       id-token: write #This is required for requesting the JWT
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-flask-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-      
+      # Login en Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -85,23 +59,12 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
+      # Despliegue de la imagen Docker en Azure Web App
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZUREAPPSERVICE_NAME_DEV }}
           slot-name: 'Production'
-          package: .
-
-      - name: Install dependencies in Azure
-        run: |
-          echo "Installing dependencies in Azure..."
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Restart Azure Web App (optional)
-        run: |
-          az webapp restart --name ${{ secrets.AZUREAPPSERVICE_NAME_DEV }} --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }}
+          images: ${{ secrets.ACR_NAME }}.azurecr.io/myapp:${{ github.sha }}
           
