@@ -27,7 +27,10 @@ jobs:
         run: |
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/myapp:${{ github.sha }} .
 
-      # Iniciar sesión en DockerHub (o ACR si usas Azure Container Registry)
+      - name: Verify Docker image exists
+        run: docker images ${{ secrets.ACR_NAME }}.azurecr.io/myapp:${{ github.sha }}
+
+      # Iniciar sesión en Azure Container Registry
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v2
         with:
@@ -38,7 +41,7 @@ jobs:
       # Subir la imagen construida a DockerHub o ACR
       - name: Push Docker image to ACR
         run: |
-          docker push ${{ secrets.ACR_NAME }}/myapp:${{ github.sha }}
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/myapp:${{ github.sha }}
 
   deploy-develop:
     if: github.ref == 'refs/heads/develop'
