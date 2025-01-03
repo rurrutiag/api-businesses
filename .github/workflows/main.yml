@@ -96,6 +96,9 @@ jobs:
       - name: Install dependencies in Azure
         run: |
           echo "Installing dependencies in Azure..."
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Restart Azure Web App (optional)
