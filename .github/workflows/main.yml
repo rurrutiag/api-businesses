@@ -31,6 +31,10 @@ jobs:
         run: |
           ./.venv/bin/pip install -r requirements.txt
 
+      - name: Validate Flask installation
+        run: |
+          ./.venv/bin/python -c "import flask; print(f'Flask version: {flask.__version__}')"
+          
       # - name: Run tests
       #   run: |
       #     ./.venv/bin/python -m unittest discover  # O tu comando para correr pruebas
@@ -39,6 +43,8 @@ jobs:
         run: |
           echo "#!/bin/bash" > startup.sh
           echo "source .venv/bin/activate" >> startup.sh
+          echo "pip install --upgrade pip" >> startup.sh
+          echo "pip install -r requirements.txt" >> startup.sh
           echo ".venv/bin/gunicorn -w 3 -b 0.0.0.0:8000 app:app" >> startup.sh
           chmod +x startup.sh
 
