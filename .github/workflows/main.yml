@@ -34,7 +34,7 @@ jobs:
       - name: Validate Flask installation
         run: |
           ./.venv/bin/python -c "import flask; print(f'Flask version: {flask.__version__}')"
-          
+
       # - name: Run tests
       #   run: |
       #     ./.venv/bin/python -m unittest discover  # O tu comando para correr pruebas
@@ -90,4 +90,13 @@ jobs:
           app-name: ${{ secrets.AZUREAPPSERVICE_NAME_DEV }}
           slot-name: 'Production'
           package: .
+
+      - name: Install dependencies in Azure
+        run: |
+          echo "Installing dependencies in Azure..."
+          pip install -r requirements.txt
+
+      - name: Restart Azure Web App (optional)
+        run: |
+          az webapp restart --name ${{ secrets.AZUREAPPSERVICE_NAME_DEV }} --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }}
           
