@@ -10,7 +10,7 @@ from tools.validate_unique_id import generate_unique_branch_ids, generate_unique
 load_dotenv()
 
 # Obtener las variables de entorno
-MS_COMPANY_B_CONFIG_BUSINESS_URL = os.getenv('MS_COMPANY_B_CONFIG_BUSINESS').strip()
+MS_COMPANY_B_CONFIG_BUSINESS_URL = os.getenv('MS_COMPANY_B_CONFIG_BUSINESS_URL').strip()
 
 def register_new_business(input_data):
     
