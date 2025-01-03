@@ -33,7 +33,7 @@ jobs:
       # Construcción de la imagen Docker
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.APP_NAME }}:${{ github.sha }} .
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.ACR_APP_NAME }}:${{ github.sha }} .
 
       - name: Verify Docker image exists
         run: docker images ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.ACR_APP_NAME }}:${{ github.sha }}
