@@ -1,4 +1,4 @@
-from flask import (Flask, jsonify)
+from flask import (Flask, jsonify, request)
 from flask_cors import CORS
 
 import os
@@ -6,7 +6,7 @@ import os
 from endpoints.get_company_data import get_company_space_data
 from endpoints.register_new_business import register_new_business
 
-cors_origins = os.getenv('CORS_ORIGINS', '').split(',')
+cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
 
 app = Flask(__name__)
 
