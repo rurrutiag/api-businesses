@@ -28,13 +28,7 @@ def home():
 @app.route('/get-company-space-data/<id>', methods=['GET'])
 def get_company_space_data_route(id):
     try:
-        # Verificar si el id tiene el formato de UUID
-        try:
-            # Intenta convertir el id a UUID
-            company_id = uuid.UUID(id)
-        except ValueError:
-            # Si no es un UUID válido, devolver un error
-            return jsonify({"message": "ID no válido, debe ser un UUID"}), 400
+        company_id = id
         company_data = get_company_space_data(company_id)
         return jsonify(company_data), 200
     except RuntimeError as e:
