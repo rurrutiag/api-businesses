@@ -19,7 +19,7 @@ def get_company_space_data(company_id):
         dict: los datos estructurados del negocio
     """
     try:
-        end_point = f"{MS_COMPANY_B_GET_INFO_URL}/get-company-data?company_id={company_id}"
+        end_point = f"{MS_COMPANY_B_GET_INFO_URL}/get-company-data/{company_id}"
         response = requests.get(end_point)
         response.raise_for_status()
         data = response.json()
