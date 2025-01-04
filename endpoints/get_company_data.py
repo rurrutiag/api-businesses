@@ -6,13 +6,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Obtener las variables de entorno
-MS_COMPANY_B_GET_INFO_URL = os.getenv('MS_COMPANY_B_GET_INFO_URL').strip()
+MS_COMPANY_B_GET_INFO_URL = os.getenv('MS_COMPANY_B_GET_INFO_URL')
+if not MS_COMPANY_B_GET_INFO_URL:
+    raise EnvironmentError("La variable de entorno 'MS_COMPANY_B_GET_INFO_URL' no está definida.")
 
 def get_company_space_data(company_id):
     """
     Obtiene la información a mostrar en el portal público del negocio.
     Args:
-        company_id (str): El ID del negocio
+        company_id (uuid.UUID): El ID del negocio en formato UUID
     Returns:
         dict: los datos estructurados del negocio
     """

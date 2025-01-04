@@ -16,7 +16,7 @@ def get_all_companies_id():
         response = requests.get(end_point)
         response.raise_for_status() # Levanta excepciones para errores HTTP
         data = response.json()
-        existing_ids = [item['id'].strip() for item in data]
+        existing_ids = [item['id'] for item in data]
         return existing_ids
     except Exception as e:
         raise RuntimeError('No se pudieron obtener los IDs existentes') from e
@@ -28,7 +28,7 @@ def get_all_branches_id():
         response = requests.get(end_point)
         response.raise_for_status()
         data = response.json()
-        existing_ids = [item['id'].strip() for item in data]
+        existing_ids = [item['id'] for item in data]
         return existing_ids
     except Exception as e:
         raise RuntimeError('No se pudieron obtener los IDs existentes') from e
@@ -40,7 +40,7 @@ def get_all_companies_et_branches_id():
         response = requests.get(end_point)
         response.raise_for_status()
         data = response.json()
-        existing_ids = [item['id'].strip() for item in data]
+        existing_ids = [item['id'] for item in data]
         return existing_ids
     except Exception as e:
         raise RuntimeError('No se pudieron obtener los IDs existentes') from e

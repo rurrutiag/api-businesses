@@ -61,12 +61,12 @@ def register_new_business(input_data):
         payload = {
             'id': register_id,
             'fantasy_name': fantasy_name,
-            'legal_info': json.dumps(legal_info),
+            'legal_info': legal_info,
             'url_domain': url_domain,
-            'industrial': json.dumps(industrial),
-            'head_quarter': json.dumps(enriched_head_quarter),
-            'branches': json.dumps(formatted_branches),
-            'modules': json.dumps(modules)
+            'industrial': industrial,
+            'head_quarter': enriched_head_quarter,
+            'branches': formatted_branches,
+            'modules': modules
         }
 
         # 7. Registrar el nuevo negocio en el microservicio
@@ -81,12 +81,6 @@ def register_new_business(input_data):
 
         # Si la respuesta es exitosa, retornar los datos
         return jsonify({ 'success': True, 'data': ms_response.json()}), 201
-    except requests.exceptions.RequestException as e:
-        print(f"Error al conectarse al microservicio: {e}")
-        return jsonify({"message": "Error de comunicación con el microservicio."}), 502
-    except ValueError as e:
-        print(f"Error de validación: {e}")
-        return jsonify({"message": f"Error de validación: {str(e)}"}), 400
     except Exception as e:
         print(f"Error inesperado: {str(e)}")
         return jsonify({"message": "Ocurrió un error inesperado.", "error": str(e)}), 500
