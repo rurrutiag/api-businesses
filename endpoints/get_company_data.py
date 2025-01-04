@@ -17,10 +17,14 @@ def get_company_space_data(company_id):
         dict: los datos estructurados del negocio
     """
     try:
-        end_point = f"{MS_COMPANY_B_GET_INFO_URL}/get-company-data"
+        end_point = f"{MS_COMPANY_B_GET_INFO_URL}/get-company-data?company_id={company_id}"
         response = requests.get(end_point)
         response.raise_for_status()
         data = response.json()
+        required_keys = ["id", "fantasy_name", "legal_info", "url_domain", "industrial"]
+        for key in required_keys:
+            if key not in data:
+                raise ValueError(f"Missing key: {key}")
         company_data = {
             "general": {
                 "id": data["id"],
@@ -34,5 +38,5 @@ def get_company_space_data(company_id):
             "modules": data["modules"],
         }
         return company_data
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         raise RuntimeError("Error al obtener los datos del negocio") from e

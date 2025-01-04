@@ -11,9 +11,16 @@ load_dotenv()
 
 # Obtener las variables de entorno
 MS_COMPANY_B_CONFIG_BUSINESS_URL = os.getenv('MS_COMPANY_B_CONFIG_BUSINESS_URL').strip()
+if not MS_COMPANY_B_CONFIG_BUSINESS_URL:
+    raise ValueError("MS_COMPANY_B_CONFIG_BUSINESS_URL no está configurada.")
 
 def register_new_business(input_data):
     
+    required_fields = ['fantasy_name', 'legal_info']
+    for field in required_fields:
+        if not input_data.get(field):
+            return jsonify({"message": f"'{field}' es requerido."}), 400
+
     fantasy_name = input_data.get('fantasy_name')
     legal_info = input_data.get('legal_info')
     url_domain = input_data.get('url_domain', "")
@@ -66,8 +73,20 @@ def register_new_business(input_data):
         endpoint_register_new_business = f"{MS_COMPANY_B_CONFIG_BUSINESS_URL}/register-new-business"
         ms_response = requests.post(endpoint_register_new_business, json=payload)
 
+        if ms_response.status_code != 201:
+            return jsonify({
+                "message": "Error al registrar el negocio en el microservicio.",
+                "error": ms_response.text
+            }), ms_response.status_code
+
         # Si la respuesta es exitosa, retornar los datos
         return jsonify({ 'success': True, 'data': ms_response.json()}), 201
+    except requests.exceptions.RequestException as e:
+        print(f"Error al conectarse al microservicio: {e}")
+        return jsonify({"message": "Error de comunicación con el microservicio."}), 502
+    except ValueError as e:
+        print(f"Error de validación: {e}")
+        return jsonify({"message": f"Error de validación: {str(e)}"}), 400
     except Exception as e:
-        print(f"Error en el registro de negocio: {str(e)}")
-        return jsonify({"message": "Error al registrar el negocio en el microservicio.", "error": str(e)}), 500
+        print(f"Error inesperado: {str(e)}")
+        return jsonify({"message": "Ocurrió un error inesperado.", "error": str(e)}), 500
