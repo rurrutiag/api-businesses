@@ -25,29 +25,29 @@ CORS(app, resources={
 def home():
     return "¡Hola, mundo desde Flask!"
 
-@app.route('/get-company-space-data/<id>', methods=['GET'])
-def get_company_space_data_route(id):
-    try:
-        # Verificar si el id tiene el formato de UUID
-        try:
-            # Intenta convertir el id a UUID
-            company_id = uuid.UUID(id)
-        except ValueError:
-            # Si no es un UUID válido, devolver un error
-            return jsonify({"message": "ID no válido, debe ser un UUID"}), 400
-        company_data = get_company_space_data(company_id)
-        return jsonify(company_data), 200
-    except RuntimeError as e:
-        return jsonify({"message": "Error al capturar datos", "error": str(e)}), 500
+# @app.route('/get-company-space-data/<id>', methods=['GET'])
+# def get_company_space_data_route(id):
+#     try:
+#         # Verificar si el id tiene el formato de UUID
+#         try:
+#             # Intenta convertir el id a UUID
+#             company_id = uuid.UUID(id)
+#         except ValueError:
+#             # Si no es un UUID válido, devolver un error
+#             return jsonify({"message": "ID no válido, debe ser un UUID"}), 400
+#         company_data = get_company_space_data(company_id)
+#         return jsonify(company_data), 200
+#     except RuntimeError as e:
+#         return jsonify({"message": "Error al capturar datos", "error": str(e)}), 500
 
-@app.route('/register-new-business', methods=['POST'])
-def register_new_business_route():
-    input_data = request.json
-    try:
-        new_business_data = register_new_business(input_data)
-        return jsonify(new_business_data), 200
-    except RuntimeError as e:
-        return jsonify({"message": "Error al registrar el negocio en el microservicio.", "error": str(e)}), 500
+# @app.route('/register-new-business', methods=['POST'])
+# def register_new_business_route():
+#     input_data = request.json
+#     try:
+#         new_business_data = register_new_business(input_data)
+#         return jsonify(new_business_data), 200
+#     except RuntimeError as e:
+#         return jsonify({"message": "Error al registrar el negocio en el microservicio.", "error": str(e)}), 500
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', debug=True, port=8080)
