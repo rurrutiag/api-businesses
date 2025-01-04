@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Python-Flask app to Azure Web App
+name: Build and deploy Flask app to Azure Web App
 
 on:
   push:
@@ -17,6 +17,12 @@ jobs:
       # Checkout del código fuente
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # Configura Python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
 
       # Configuración de Docker
       - name: Set up Docker Buildx
@@ -36,13 +42,11 @@ jobs:
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.ACR_APP_NAME }}:${{ github.sha }} \
                        -t ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.ACR_APP_NAME }}:latest .
 
-      - name: Verify Docker image exists
-        run: docker images ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.ACR_APP_NAME }}:${{ github.sha }}
-
       # Subir la imagen construida a Azure Container Registry
       - name: Push Docker image to ACR
         run: |
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.ACR_APP_NAME }}:${{ github.sha }}
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.ACR_APP_NAME }}:latest
 
   deploy-develop:
     if: github.ref == 'refs/heads/develop'
