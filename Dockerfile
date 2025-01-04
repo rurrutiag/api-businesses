@@ -3,15 +3,15 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Copia los archivos del proyecto al contenedor
-COPY endpoints/ /app/endpoints/
-COPY app.py /app/
-COPY requirements.txt /app/
+COPY ./requirements.txt /app/
 
 RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+COPY ./endpoints/ /app/endpoints/
+COPY ./app.py /app/
 
 EXPOSE 8080
 
 ENV FLASK_APP=app.py
 
-CMD ["gunicorn", "app:app", "-b", "0.0.0.0:8080", "-w", "4"]
+CMD ["flask", "run", "--host", "0.0.0.0:8080"]
