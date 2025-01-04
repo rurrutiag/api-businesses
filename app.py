@@ -6,7 +6,7 @@ load_dotenv()
 
 import os
 
-# from endpoints.get_company_data import get_company_space_data
+from endpoints.get_company_data import get_company_space_data
 # from endpoints.register_new_business import register_new_business
 
 cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
@@ -25,20 +25,20 @@ CORS(app, resources={
 def home():
     return "¡Hola, mundo desde Flask!"
 
-# @app.route('/get-company-space-data/<id>', methods=['GET'])
-# def get_company_space_data_route(id):
-#     try:
-#         # Verificar si el id tiene el formato de UUID
-#         try:
-#             # Intenta convertir el id a UUID
-#             company_id = uuid.UUID(id)
-#         except ValueError:
-#             # Si no es un UUID válido, devolver un error
-#             return jsonify({"message": "ID no válido, debe ser un UUID"}), 400
-#         company_data = get_company_space_data(company_id)
-#         return jsonify(company_data), 200
-#     except RuntimeError as e:
-#         return jsonify({"message": "Error al capturar datos", "error": str(e)}), 500
+@app.route('/get-company-space-data/<id>', methods=['GET'])
+def get_company_space_data_route(id):
+    try:
+        # Verificar si el id tiene el formato de UUID
+        try:
+            # Intenta convertir el id a UUID
+            company_id = uuid.UUID(id)
+        except ValueError:
+            # Si no es un UUID válido, devolver un error
+            return jsonify({"message": "ID no válido, debe ser un UUID"}), 400
+        company_data = get_company_space_data(company_id)
+        return jsonify(company_data), 200
+    except RuntimeError as e:
+        return jsonify({"message": "Error al capturar datos", "error": str(e)}), 500
 
 # @app.route('/register-new-business', methods=['POST'])
 # def register_new_business_route():
