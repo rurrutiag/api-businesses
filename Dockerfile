@@ -3,14 +3,14 @@ FROM python:3.9-slim
 
 EXPOSE 8080
 
+# Copia los archivos del proyecto al contenedor
+COPY . /app
+
 # Define el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos del proyecto al contenedor
-COPY requirements.txt /app/
+EXPOSE 8080
 
 RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /app/
 
 CMD ["python", "app.py"]
