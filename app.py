@@ -1,7 +1,7 @@
-import os
-
 from flask import (Flask, jsonify)
 from flask_cors import CORS
+
+import os
 
 from endpoints.get_company_data import get_company_space_data
 from endpoints.register_new_business import register_new_business
@@ -17,6 +17,10 @@ CORS(app, resources={
         "allow_headers": ["Content-Type", "Authorization"]
     }
 })
+
+@app.route('/')
+def home():
+    return "¡Hola, mundo desde Flask!"
 
 @app.route('/get-company-space-data/<id>', methods=['GET'])
 def get_company_space_data_route(id):
