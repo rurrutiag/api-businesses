@@ -6,8 +6,8 @@ load_dotenv()
 
 import os
 
-from endpoints.get_company_data import get_company_space_data
-from endpoints.register_new_business import register_new_business
+# from endpoints.get_company_data import get_company_space_data
+# from endpoints.register_new_business import register_new_business
 
 cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
 
