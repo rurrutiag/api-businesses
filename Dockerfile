@@ -7,11 +7,10 @@ EXPOSE 80
 WORKDIR /app
 
 # Copia los archivos del proyecto al contenedor
-COPY requirements.txt .
+COPY requirements.txt /app/
 
-RUN python -m pip install --upgrade pip && \
-    python -m pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . /app
+COPY . /app/
 
 CMD ["python", "app.py"]
