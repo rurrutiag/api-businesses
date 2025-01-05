@@ -17,7 +17,7 @@ class BusinessData(BaseModel):
     owner_name: str = Field(..., min_length=1, max_length=100, description="Nombre del propietario")
     email: EmailStr = Field(..., description="Correo electrónico válido del propietario")
     address: Optional[str] = Field(None, max_length=250, description="Dirección del negocio (opcional)")
-    phone_number: Optional[str] = Field(None, regex=r"^\+?[0-9]{7,15}$", description="Número de teléfono (opcional)")
+    phone_number: Optional[str] = Field(None, pattern=r"^\+?[0-9]{7,15}$", description="Número de teléfono (opcional)")
     notes: Optional[str] = Field(None, max_length=500, description="Notas adicionales (opcional)")
 
 def fetch_data_from_endpoint(endpoint: str):
