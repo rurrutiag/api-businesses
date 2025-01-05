@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Certificados locales
+localhost-key.pem
+localhost.pem

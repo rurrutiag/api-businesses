@@ -102,12 +102,13 @@ def register_new_business(input_data):
             'branches': formatted_branches,
             'modules': validated_data['modules']
         }
-        
+         
         # 7. Registrar el nuevo negocio en el microservicio
         endpoint_register_new_business = f"{MS_COMPANY_B_CONFIG_BUSINESS_URL}/register-new-business"
+        print(endpoint_register_new_business)
         ms_response = requests.post(endpoint_register_new_business, json=payload)
 
-        print(ms_response.json())
+        print(type(ms_response))
 
         if ms_response.status_code != 201:
             return {
