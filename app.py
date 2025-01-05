@@ -40,9 +40,8 @@ def register_new_business_route():
     if not input_data:
         return jsonify({"message": "El cuerpo de la solicitud está vacío o no es JSON válido."}), 400
     try:
-        # new_business_data = register_new_business(input_data)
-        # return jsonify(new_business_data), 200
-        return input_data, 200
+        new_business_data = register_new_business(input_data)
+        return jsonify(new_business_data), 200
     except RuntimeError as e:
         return jsonify({"message": "Error al registrar el negocio en el microservicio.", "error": str(e)}), 500
 

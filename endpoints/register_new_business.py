@@ -56,6 +56,7 @@ def register_new_business(input_data):
     try:
         # Validar la estructura de los datos de entrada
         validated_data = BusinessInput(**input_data)
+        return validated_data
     except ValidationError as e:
         return jsonify({"message": "Datos de entrada inválidos.", "errors": e.errors()}), 400
 
