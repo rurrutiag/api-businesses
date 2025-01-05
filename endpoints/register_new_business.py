@@ -131,7 +131,7 @@ def register_new_business(input_data):
             }), ms_response.status_code
 
         # Si la respuesta es exitosa, retornar los datos
-        return jsonify({ 'success': True, 'data': ms_response.json()}), 201
+        return jsonify({ 'success': True, 'data': ms_response.json()})
     except Exception as e:
         print(f"Error inesperado: {str(e)}")
-        return jsonify({"message": "Ocurrió un error inesperado.", "error": str(e)}), 500
+        return jsonify({"message": "Ocurrió un error inesperado.", "error": str(e)})
