@@ -86,7 +86,8 @@ def get_all_companies_et_branches_id():
     """
     endpoint = f"{MS_COMPANY_B_GET_INFO_URL}/get-all-companies-et-branches-id"
     data = fetch_data_from_endpoint(endpoint)
-    return [item.get('id') for item in data]
+    # return [item.get('id') for item in data]
+    return data
     
 def generate_unique_company_id(savannah=None, query_the_db=False):
     """
