@@ -2,6 +2,8 @@ import os
 import requests
 import uuid
 from dotenv import load_dotenv
+from pydantic import (BaseModel, Field, EmailStr)
+from typing import Optional
 
 # Cargar variables de entorno
 load_dotenv()
@@ -10,6 +12,13 @@ load_dotenv()
 MS_COMPANY_B_GET_INFO_URL = os.getenv('MS_COMPANY_B_GET_INFO_URL')
 if not MS_COMPANY_B_GET_INFO_URL:
     raise ValueError("MS_COMPANY_B_GET_INFO_URL no está configurada.")
+class BusinessData(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100, description="Nombre del negocio")
+    owner_name: str = Field(..., min_length=1, max_length=100, description="Nombre del propietario")
+    email: EmailStr = Field(..., description="Correo electrónico válido del propietario")
+    address: Optional[str] = Field(None, max_length=250, description="Dirección del negocio (opcional)")
+    phone_number: Optional[str] = Field(None, regex=r"^\+?[0-9]{7,15}$", description="Número de teléfono (opcional)")
+    notes: Optional[str] = Field(None, max_length=500, description="Notas adicionales (opcional)")
 
 def fetch_data_from_endpoint(endpoint: str):
     """

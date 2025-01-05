@@ -8,6 +8,7 @@ COPY ./requirements.txt /app/
 RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY ./endpoints/ /app/endpoints/
+COPY ./tools/ /app/tools/
 COPY ./app.py /app/
 
 EXPOSE 8080
