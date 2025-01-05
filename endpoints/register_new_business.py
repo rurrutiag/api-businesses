@@ -82,6 +82,11 @@ def register_new_business(input_data):
         existing_data = get_all_companies_et_branches_id()
         existing_company_ids = [company['id'] for company in existing_data]
         existing_branch_ids = [company['branch_ids'] for company in existing_data]
+        return jsonify({
+            existing_data,
+            existing_company_ids,
+            existing_branch_ids
+        })
 
         # 2. Generar el ID único para la compañía y la sede principal
         register_id = generate_unique_company_id(savannah=existing_company_ids, query_the_db=False)
