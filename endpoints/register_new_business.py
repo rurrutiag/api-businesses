@@ -53,15 +53,23 @@ def register_new_business(input_data):
     #     if not input_data.get(field):
     #         return jsonify({"message": f"'{field}' es requerido."}), 400
 
-    try:
-        # Validar la estructura de los datos de entrada
-        validated_data = BusinessInput(**input_data)
-        return validated_data
-    except ValidationError as e:
-        return jsonify({"message": "Datos de entrada inválidos.", "errors": e.errors()}), 400
+    # try:
+    #     # Validar la estructura de los datos de entrada
+    #     validated_data = BusinessInput(**input_data)
+    # except ValidationError as e:
+    #     return jsonify({"message": "Datos de entrada inválidos.", "errors": e.errors()}), 400
 
     try:
         # 0. Crear variables independientes con los datos rescatados desde input_data
+        validated_data = {
+            'fantasy_name' : input_data.get('fantasy_name'),
+            'legal_info' : input_data.get('legal_info'),
+            'url_domain' : input_data.get('url_domain', ""),
+            'industrial' : input_data.get('industrial', []),
+            'head_quarter' : input_data.get('head_quarter', {}),
+            'branches' : input_data.get('branches', []),
+            'modules' : input_data.get('modules', {})
+        }
         # fantasy_name = input_data.get('fantasy_name')
         # legal_info = input_data.get('legal_info')
         # url_domain = input_data.get('url_domain', "")
