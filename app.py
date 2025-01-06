@@ -1,4 +1,4 @@
-from flask import (Flask, jsonify, request)
+from flask import (Flask, jsonify, request, send_from_directory, redirect)
 from flask_cors import CORS
 from dotenv import load_dotenv
 import uuid
@@ -23,7 +23,11 @@ CORS(app, resources={
 
 @app.route('/')
 def home():
-    return "¡Hola, mundo desde Flask!"
+    return send_from_directory('static','index.html')
+
+@app.errorhandler(404)
+def not_found(e):
+    return redirect('/'), 404
 
 @app.route('/get-company-space-data/<id>', methods=['GET'])
 def get_company_space_data_route(id):
