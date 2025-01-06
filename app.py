@@ -16,7 +16,7 @@ app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
         "origins": cors_origins if cors_origins else "*", # Si no se define, permitir todos los orígenes
-        "methods": ["GET", "POST"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
 })
@@ -28,6 +28,19 @@ def home():
 @app.errorhandler(404)
 def not_found(e):
     return redirect('/'), 404
+
+@app.after_request
+def handle_cors(response):
+    # Obtener el origen de la solicitud
+    origin = request.headers.get('Origin')
+    
+    # Si el origen no está en la lista permitida, redirigir a la raíz
+    if origin not in cors_origins and cors_origins != ['*']:
+        response.status_code = 302  # Código de redirección
+        response.headers['Location'] = '/'  # Redirige a la raíz
+        response.data = b''  # Limpia el cuerpo de la respuesta
+    
+    return response
 
 @app.route('/get-company-space-data/<id>', methods=['GET'])
 def get_company_space_data_route(id):
