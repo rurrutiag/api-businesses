@@ -10,7 +10,7 @@ MS_COMPANY_B_GET_INFO_URL = os.getenv('MS_COMPANY_B_GET_INFO_URL')
 if not MS_COMPANY_B_GET_INFO_URL:
     raise EnvironmentError("La variable de entorno 'MS_COMPANY_B_GET_INFO_URL' no está definida.")
 
-def get_company_space_data(company_id):
+def get_company_main_data(company_id):
     """
     Obtiene la información a mostrar en el portal público del negocio.
     Args:
@@ -23,21 +23,15 @@ def get_company_space_data(company_id):
         response = requests.get(end_point)
         response.raise_for_status()
         data = response.json()
-        required_keys = ["id", "fantasy_name", "legal_info", "url_domain", "industrial"]
+        required_keys = ["id", "fantasy_name", "legal_info", "url_domain"]
         for key in required_keys:
             if key not in data:
                 raise ValueError(f"Missing key: {key}")
         company_data = {
-            "general": {
-                "id": data["id"],
-                "fantasy_name": data["fantasy_name"],
-                "legal_info": data["legal_info"],
-                "url_domain": data["url_domain"],
-                "idustrial": data["industrial"],
-            },
-            "head_quarter": data["head_quarter"],
-            "branches": data["branches"],
-            "modules": data["modules"],
+            "id": data["id"],
+            "fantasy_name": data["fantasy_name"],
+            "legal_info": data["legal_info"],
+            "url_domain": data["url_domain"]
         }
         return company_data
     except requests.exceptions.RequestException as e:

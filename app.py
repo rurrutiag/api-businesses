@@ -6,8 +6,9 @@ load_dotenv()
 
 import os
 
-from endpoints.get_company_data import get_company_space_data
+from endpoints.get_company_data import get_company_main_data
 from endpoints.register_new_business import register_new_business
+from endpoints.setup_business import setup_business
 
 cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
 
@@ -42,11 +43,11 @@ def handle_cors(response):
     
     return response
 
-@app.route('/get-company-space-data/<id>', methods=['GET'])
-def get_company_space_data_route(id):
+@app.route('/get-company-main-data/<id>', methods=['GET'])
+def get_company_main_data_route(id):
     try:
         company_id = id
-        company_data = get_company_space_data(company_id)
+        company_data = get_company_main_data(company_id)
         return jsonify(company_data), 200
     except RuntimeError as e:
         return jsonify({"message": "Error al capturar datos", "error": str(e)}), 500
@@ -61,6 +62,17 @@ def register_new_business_route():
         return jsonify(new_business_data), 200
     except RuntimeError as e:
         return jsonify({"message": "Error al registrar el negocio en el microservicio.", "error": str(e)}), 500
+
+@app.route('/setup-business', methods=['POST'])
+def setup_business_route():
+    input_data = request.json
+    if not input_data:
+        return jsonify({"message": "El cuerpo de la solicitud está vacío o no es JSON válido."}), 400
+    try:
+        endpoint_response = setup_business(input_data)
+        return jsonify(endpoint_response), 200
+    except RuntimeError as e:
+        return jsonify({"message": "Error de configuración del negocio al conectar con el microservicio.", "error": str(e)}), 500
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', debug=True, port=8080)

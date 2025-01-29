@@ -1,124 +1,69 @@
-import uuid
 import os
-import requests
 from dotenv import load_dotenv
 from flask import jsonify
-from tools.validate_unique_id import (
-    generate_unique_branch_ids,
-    generate_unique_company_id,
-    get_all_companies_et_branches_id)
+from tools.communication_with_microservices import (
+    touch_post_ms
+)
 
-# Cargar variables de entorno
+# Load environment variables
 load_dotenv()
 
-# Obtener las variables de entorno
+# Get environments variables
 MS_COMPANY_B_CONFIG_BUSINESS_URL = os.getenv('MS_COMPANY_B_CONFIG_BUSINESS_URL')
 if not MS_COMPANY_B_CONFIG_BUSINESS_URL:
     raise ValueError("MS_COMPANY_B_CONFIG_BUSINESS_URL no está configurada.")
 
 def register_new_business(input_data):
     """
-    Registra un nuevo negocio utilizando un microservicio.
+    Register a new business.
     
-    Parámetros:
+    Parameters:
     -----------
     input_data : dict
-        Datos del negocio que se desean registrar. Deben incluir los campos:
-        - fantasy_name: Nombre de fantasía del negocio.
-        - legal_info: Información legal del negocio.
-        - url_domain (opcional): Dominio del negocio.
-        - industrial (opcional): Lista de sectores industriales.
-        - head_quarter (opcional): Información de la sede principal.
-        - branches (opcional): Lista de sucursales.
-        - modules (opcional): Módulos habilitados para el negocio.
-    
-    Retorno:
+        Business data to be registered. Must include the following fields:
+        - fantasy_name: Fantasy name of the business (to consumers).
+        - legal_info: Legal information of the business (A.K.A.: Unique tax role, among others).
+        - url_domain (opcional): w3 business domain.    
+    Return:
     --------
     Response:
-        Respuesta en formato JSON con el resultado de la operación.
+        JSON response with operation results, include company ID.
     """
     
-    # required_fields = ['fantasy_name', 'legal_info']
-    # for field in required_fields:
-    #     if not input_data.get(field):
-    #         return jsonify({"message": f"'{field}' es requerido."}), 400
-
-    # try:
-    #     # Validar la estructura de los datos de entrada
-    #     validated_data = BusinessInput(**input_data)
-    # except ValidationError as e:
-    #     return jsonify({"message": "Datos de entrada inválidos.", "errors": e.errors()}), 400
-
     try:
-        # 0. Crear variables independientes con los datos rescatados desde input_data
+        # 0. Set array with request data from input_data
         validated_data = {
             'fantasy_name' : input_data.get('fantasy_name'),
             'legal_info' : input_data.get('legal_info'),
-            'url_domain' : input_data.get('url_domain', ""),
-            'industrial' : input_data.get('industrial', []),
-            'head_quarter' : input_data.get('head_quarter', {}),
-            'branches' : input_data.get('branches', []),
-            'modules' : input_data.get('modules', {})
+            'url_domain' : input_data.get('url_domain', "")
         }
-
-        # 1. Consultar todos los ids y branch_ids existentes
-        existing_data = get_all_companies_et_branches_id()
-        existing_company_ids = [company['id'] for company in existing_data]
-        existing_branch_ids = [company['branch_ids'] for company in existing_data]
-
-        # 2. Generar el ID único para la compañía y la sede principal
-        register_id = generate_unique_company_id(savannah=existing_company_ids, query_the_db=False)
-        head_quarter_id = str(uuid.uuid4())
-        while head_quarter_id in existing_branch_ids:
-            head_quarter_id = str(uuid.uuid4())
-
-        # 3. Generar los branch_ids únicos para las sucursales
-        formatted_branches = []
-        if len(validated_data['branches']) > 0:
-            formatted_branches = generate_unique_branch_ids(
-                existing_branch_ids=existing_branch_ids,
-                new_branches=validated_data.branches
-            )
-       
-        # 4. Asegurar que la sede principal también tenga un ID único
-        formatted_branches.append({
-            'branch_id': head_quarter_id,
-            'is_hq': True,
-            'is_visible': False,
-            **validated_data['head_quarter']
-        })
+      
+        # 1. Set variables with the endpoint urls
+        endpoint_register_new_company = f"{MS_COMPANY_B_CONFIG_BUSINESS_URL}/register-new-company"
         
-        # 5. Agregar el ID único al head_quarter
-        enriched_head_quarter = {**validated_data['head_quarter'], 'id': head_quarter_id}
-        
-        # 6. Construir el objeto de negocio
+        # 2. Set Api response variable
+        api_response = {}
+
+        # 3. Create the company in the database
         payload = {
-            'id': register_id,
             'fantasy_name': validated_data['fantasy_name'],
             'legal_info': validated_data['legal_info'],
-            'url_domain': validated_data['url_domain'],
-            'industrial': validated_data['industrial'],
-            'head_quarter': enriched_head_quarter,
-            'branches': formatted_branches,
-            'modules': validated_data['modules']
+            'url_domain': validated_data['url_domain']
         }
-         
-        # 7. Registrar el nuevo negocio en el microservicio
-        endpoint_register_new_business = f"{MS_COMPANY_B_CONFIG_BUSINESS_URL}/register-new-business"
-        print(endpoint_register_new_business)
-        ms_response = requests.post(endpoint_register_new_business, json=payload)
+        
+        ms_register_new_company = touch_post_ms(endpoint_url=endpoint_register_new_company, payload=payload)
+        
+        if not ms_register_new_company or 'company_id' not in ms_register_new_company:
+            return {'error': 'Error registering business'}
 
-        print(type(ms_response))
+        # 4 Set identificator string company
+        company_id = ms_register_new_company['company_id']
+        api_response['results'] = ms_register_new_company
 
-        if ms_response.status_code != 201:
-            return {
-                "message": "Error al registrar el negocio en el microservicio.",
-                "error": ms_response.text,
-                "code": ms_response.status_code
-            }
-
-        # Si la respuesta es exitosa, retornar los datos
-        return { 'success': True, 'data': ms_response.json()}
+        return {
+            'success': True,
+            'data': api_response
+        }
     except Exception as e:
         print(f"Error inesperado: {str(e)}")
-        return jsonify({"message": "Ocurrió un error inesperado.", "error": str(e)})
+        return jsonify({"message": "Unexpected error happen", "error": str(e)})
